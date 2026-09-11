@@ -1,6 +1,6 @@
 namespace Ryujinx.Cpu.AppleHv.Arm
 {
-    enum ApFlags : ulong
+    public enum ApFlags : ulong
     {
         ApShift = 6,
         PxnShift = 53,

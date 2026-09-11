@@ -190,7 +190,7 @@ namespace Ryujinx.Headless
             }
 
             SDL_PropertiesID props = SDL_CreateProperties();
-            SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, $"Ryujinx {Program.Version}{titleNameSection}{titleVersionSection}{titleIdSection}{titleArchSection}");
+            SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, $"Ryujinx {ReleaseInformation.Version}{titleNameSection}{titleVersionSection}{titleIdSection}{titleArchSection}");
             SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, SDL_WINDOWPOS_CENTERED_DISPLAY(DisplayId));
             SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, SDL_WINDOWPOS_CENTERED_DISPLAY(DisplayId));
             SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, Width);

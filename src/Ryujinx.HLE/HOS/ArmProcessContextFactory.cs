@@ -11,6 +11,8 @@ using Ryujinx.Memory;
 using System;
 using System.Runtime.InteropServices;
 
+using Ryujinx.Cpu.LinuxKvm;
+
 namespace Ryujinx.HLE.HOS
 {
     class ArmProcessContextFactory : IProcessContextFactory
@@ -58,8 +60,20 @@ namespace Ryujinx.HLE.HOS
                 HvMemoryManager memoryManager = new(context.Memory, addressSpaceSize, invalidAccessHandler);
                 processContext = new ArmProcessContext<HvMemoryManager>(pid, cpuEngine, _gpu, memoryManager, addressSpaceSize, for64Bit);
             }
+            else if (OperatingSystem.IsLinux() && isArm64Host && for64Bit && context.Device.Configuration.UseHypervisor && KvmCapabilities.IsSupported)
+            {
+                Logger.Info?.Print(LogClass.Cpu, "[KVM] Using Linux KVM ARM64 hardware virtualization CPU backend.");
+                KvmEngine cpuEngine = new(_tickSource);
+                KvmMemoryManager memoryManager = new(context.Memory, addressSpaceSize, invalidAccessHandler);
+                processContext = new ArmProcessContext<KvmMemoryManager>(pid, cpuEngine, _gpu, memoryManager, addressSpaceSize, for64Bit);
+            }
             else
             {
+                if (OperatingSystem.IsLinux() && isArm64Host && for64Bit && context.Device.Configuration.UseHypervisor && !KvmCapabilities.IsSupported)
+                {
+                    Logger.Warning?.Print(LogClass.Cpu, $"[KVM] Hardware virtualization requested but unavailable ({KvmCapabilities.UnavailableReason}). Falling back to JIT.");
+                }
+
                 MemoryManagerMode mode = context.Device.Configuration.MemoryManagerMode;
 
                 if (!MemoryBlock.SupportsFlags(MemoryAllocationFlags.ViewCompatible))
